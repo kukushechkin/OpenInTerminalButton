@@ -1,6 +1,6 @@
 # OpenInTerminalButton
 
-A tiny SwiftPM package that provides a button for opening the current Finder window in macOS Terminal.app or iTerm2.app.
+A tiny SwiftPM package that provides a library and a SwiftUI button for opening a folder in macOS Terminal.app or iTerm2.app.
 
 ## Comptbitility
 
