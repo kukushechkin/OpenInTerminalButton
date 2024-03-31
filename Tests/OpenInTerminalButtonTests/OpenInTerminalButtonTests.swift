@@ -97,19 +97,13 @@ final class OpenInTerminalButtonTests: XCTestCase {
 
     // MARK: Apple Scripts tests
 
-    func testAllSupportedTerminalsHaveScripts() throws {
-        for terminal in SupportedTerminal.allCases {
-            print("testing if \(terminal) has an associated AppleScript")
-            XCTAssertNotNil(appleScriptsForTerminal[terminal])
-        }
-    }
-
     // I am not sure what kind of script string is invalid,
     // even something like "tell application \"Finder\" to sing a song"
     // seems to construct NSAppleScript.
     func testAllDefinedScriptsCanBeLoaded() throws {
         XCTAssertNotNil(NSAppleScript(source: "tell application \"Finder\" to sing a song"))
-        for script in appleScriptsForTerminal.values {
+        for terminal in SupportedTerminal.allCases {
+            let script = appleScript(for: terminal)
             XCTAssertNotNil(script)
             XCTAssertNotNil(NSAppleScript(source: script))
         }

@@ -11,7 +11,6 @@ import AppKit
 
 public enum OpenInTerminalError: Error, Equatable {
     case noTerminalFound
-    case noScriptFound
     case failedToInitializeAppleScript
     case failedToExecuteAppleScript(String)
 }
@@ -50,10 +49,14 @@ var openInTerminalInternals = OpenInTerminalInernals()
 
 let commandsPlaceholder = "COMMANDS_PLACEHOLDER"
 
-let appleScriptsForTerminal: [SupportedTerminal: String] = [
-    .iterm2: openiTerm2AndRunCommandsScript,
-    .terminal: openTerminalAndRunCommandsScript,
-]
+func appleScript(for terminal: SupportedTerminal) -> String {
+    switch terminal {
+    case .iterm2:
+        return openiTerm2AndRunCommandsScript
+    case .terminal:
+        return openTerminalAndRunCommandsScript
+    }
+}
 
 func insert(commands: [String], to scriptString: String) -> String {
     let commandsStr = commands.joined(separator: ";")
@@ -88,9 +91,7 @@ func openLocationAndRunCommands(
     terminalURL _: URL,
     terminal: SupportedTerminal
 ) -> Result<SupportedTerminal, OpenInTerminalError> {
-    guard let script = appleScriptsForTerminal[terminal] else {
-        return .failure(.noScriptFound)
-    }
+    let script = appleScript(for: terminal)
     switch runAppleScript(script, commands: commands) {
     case .success:
         return .success(terminal)
