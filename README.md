@@ -17,7 +17,7 @@ that app will, most probably, [not pass the App Store review process](https://de
 - `struct BorderlessButton: View` - a SwuftUI button without a border and background.
 - `enum OpenInTerminalError` — an enumeration of possible errors.
 - `enum SupportedTerminal` — an enumeration of possible terminal applications.
-- `func openInTerminal(location: URL, commands: [String]?) -> Result<SupportedTerminal, OpenInTerminalError>` — a function that opens the specified location in Terminal.app or iTerm2.app and runs the specified commands.
+- `func openInTerminal(location: URL, commands: [String]?) async throws -> Result<SupportedTerminal, OpenInTerminalError>` — a function that opens the specified location in Terminal.app or iTerm2.app and runs the specified commands.
 
 ## Usage
 

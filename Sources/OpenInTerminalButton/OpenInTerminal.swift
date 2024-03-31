@@ -20,7 +20,7 @@ public enum SupportedTerminal: String, CaseIterable {
     case iterm2 = "com.googlecode.iterm2"
 }
 
-public func openInTerminal(location: URL, commands: [String]?) -> Result<SupportedTerminal, OpenInTerminalError> {
+public func openInTerminal(location: URL, commands: [String]?) async throws -> Result<SupportedTerminal, OpenInTerminalError> {
     guard let terminal = terminalToUse(),
           let terminalURL = URLFor(terminal: terminal)
     else {
@@ -31,7 +31,7 @@ public func openInTerminal(location: URL, commands: [String]?) -> Result<Support
     if let commands = commands, !commands.isEmpty {
         return openLocationAndRunCommands(location, commands: commands, terminalURL: terminalURL, terminal: terminal)
     } else {
-        return openLocation(location, terminalURL: terminalURL, terminal: terminal)
+        return try await openLocation(location, terminalURL: terminalURL, terminal: terminal)
     }
 }
 
@@ -80,8 +80,8 @@ func openLocation(
     _ url: URL,
     terminalURL _: URL,
     terminal: SupportedTerminal
-) -> Result<SupportedTerminal, OpenInTerminalError> {
-    openInTerminalInternals.workspace.open([url], withApplicationAt: url, configuration: NSWorkspace.OpenConfiguration())
+) async throws -> Result<SupportedTerminal, OpenInTerminalError> {
+    try await openInTerminalInternals.workspace.open([url], withApplicationAt: url, configuration: NSWorkspace.OpenConfiguration())
     return .success(terminal)
 }
 

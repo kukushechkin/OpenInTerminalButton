@@ -19,9 +19,11 @@ public struct OpenInTerminalButton: View {
     public var body: some View {
         BorderlessButton(action: {
             DispatchQueue.global().async {
-                let result = openInTerminal(location: location, commands: commands)
-                if case let .failure(error) = result {
-                    print("Failed to open \(self.location) with commands \(self.commands) in terminal: \(error)")
+                Task {
+                    let result = try await openInTerminal(location: location, commands: commands)
+                    if case let .failure(error) = result {
+                        print("Failed to open \(self.location) with commands \(self.commands) in terminal: \(error)")
+                    }
                 }
             }
         }, label: {

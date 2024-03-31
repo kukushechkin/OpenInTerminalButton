@@ -77,20 +77,18 @@ final class OpenInTerminalButtonTests: XCTestCase {
 
     // MARK: - Test openLocation
 
-    func testOpenLocation() throws {
+    func testOpenLocation() async throws {
         let workspace = NSWorkspaceMock()
         openInTerminalInternals.workspace = workspace
 
         let url = URL(fileURLWithPath: "/Users")
         let terminalURL = URL(fileURLWithPath: "/Applications/FakeTerminal.app")
         workspace.urlsForApplications = [SupportedTerminal.terminal.rawValue: terminalURL]
-        var result = openLocation(url, terminalURL: terminalURL, terminal: .terminal)
-        sleep(1) // NSWorksapce is async
+        var result = try await openLocation(url, terminalURL: terminalURL, terminal: .terminal)
         XCTAssertEqual(try? result.get(), .terminal)
         XCTAssertEqual(workspace.openedLocations, [url.absoluteString])
 
-        result = openLocation(url, terminalURL: terminalURL, terminal: .terminal)
-        sleep(1) // NSWorksapce is async
+        result = try await openLocation(url, terminalURL: terminalURL, terminal: .terminal)
         XCTAssertEqual(try? result.get(), .terminal)
         XCTAssertEqual(workspace.openedLocations, [url.absoluteString, url.absoluteString])
     }
@@ -144,12 +142,12 @@ final class OpenInTerminalButtonTests: XCTestCase {
 
     // MARK: - Test openInTerminal
 
-    func testOpenInTerminalNoTerminalFound() throws {
+    func testOpenInTerminalNoTerminalFound() async throws {
         let workspace = NSWorkspaceMock()
         openInTerminalInternals.workspace = workspace
 
         let url = URL(fileURLWithPath: "/Users")
-        let result = openInTerminal(location: url, commands: nil)
+        let result = try await openInTerminal(location: url, commands: nil)
         if case let .failure(error) = result {
             XCTAssertEqual(error, .noTerminalFound)
         } else {
@@ -157,20 +155,19 @@ final class OpenInTerminalButtonTests: XCTestCase {
         }
     }
 
-    func testOpenInTerminalNoCommands() throws {
+    func testOpenInTerminalNoCommands() async throws {
         let workspace = NSWorkspaceMock()
         openInTerminalInternals.workspace = workspace
 
         let url = URL(fileURLWithPath: "/Users")
         let terminalURL = URL(fileURLWithPath: "/Applications/FakeTerminal.app")
         workspace.urlsForApplications = [SupportedTerminal.terminal.rawValue: terminalURL]
-        let result = openInTerminal(location: url, commands: nil)
+        let result = try await openInTerminal(location: url, commands: nil)
         XCTAssertEqual(try? result.get(), .terminal)
-        sleep(1) // NSWorksapce is async
         XCTAssertFalse(workspace.openedLocations.isEmpty)
     }
 
-    func testOpenInTerminalCommands() throws {
+    func testOpenInTerminalCommands() async throws {
         let workspace = NSWorkspaceMock()
         openInTerminalInternals.workspace = workspace
         openInTerminalInternals.appleScriptClass = NSAppleScriptMock.self
@@ -178,7 +175,7 @@ final class OpenInTerminalButtonTests: XCTestCase {
         let url = URL(fileURLWithPath: "/Users")
         let terminalURL = URL(fileURLWithPath: "/Applications/FakeTerminal.app")
         workspace.urlsForApplications = [SupportedTerminal.terminal.rawValue: terminalURL]
-        let result = openInTerminal(location: url, commands: ["ls", "cd ~/Downloads"])
+        let result = try await openInTerminal(location: url, commands: ["ls", "cd ~/Downloads"])
         XCTAssertEqual(try? result.get(), .terminal)
         XCTAssertTrue(workspace.openedLocations.isEmpty)
         XCTAssertFalse(NSAppleScriptMock.executedScripts.isEmpty)
